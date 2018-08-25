@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+       <!--Bootstrap CSS-->
+      <!--<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">-->
+      <link rel="stylesheet" href="style.css">
+
+    <title>Task list</title>
+    <script src="react.development.js"></script>
+    <script src="react-dom.development.js"></script>
+    
+    <!--Babel-->
+    <script src="babel.min.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+
+        class Task extends React.Component {
+            constructor(props) {
+                super(props);
+                this.state = {
+                    edit: false,
+                };
+
+             this.textAreaRef = React.createRef();
+            };
+
+            editContent = () => {
+                this.setState ({edit: true});
+            };
+
+            removeContent = () => {
+                this.props.deleteTaskBlock (this.props.index);
+            };
+
+            saveContent = () => {
+                this.props.updateTaskBlockText (this.textAreaRef.current.value, this.props.index);
+                this.setState ({edit: false})
+            };
+
+            EditMode = () => {
+                return (
+                    <div className="box">
+                        <textarea ref={this.textAreaRef} placeholder="Enter your task..."></textarea>
+                        <button onClick={this.saveContent} className="btn success">Save</button>
+                    </div>
+                );
+            };
+
+            nonEditMode = () => {
+                return (
+                    <div className="box">
+                        <div className="text">{this.props.children}</div>
+                        <button onClick={this.editContent} className="btn light">Edit</button>
+                        <button onClick={this.removeContent} className="btn red">Delete</button>
+                    </div>
+                );
+            } ;
+
+            render() {
+                if (this.state.edit) {
+                    return this.EditMode();
+                } else {
+                    return this.nonEditMode();
+                }
+            }
+        };
+
+        class Shell extends React.Component {
+            constructor(props) {
+                super(props);
+                this.state = {
+                    tasks: [],
+                };
+            }
+
+            addNewTask = (text) => {
+                let arr = this.state.tasks;
+                arr.push(text);
+                this.setState ({tasks: arr});
+
+
+            };
+
+            deleteTaskBlock = (i) => {
+                let arr = this.state.tasks;
+                arr.splice(i, 1);
+                this.setState ({tasks: arr});
+            };
+
+            updateTaskBlockText = (text, i) => {
+                let arr = this.state.tasks;
+                arr[i] = text;
+                this.setState ({tasks: arr});
+            };
+
+            eachTask = (item, i) => {
+                return (
+                    <Task key={i} index={i} updateTaskBlockText={this.updateTaskBlockText} deleteTaskBlock={this.deleteTaskBlock}>
+                        {item}
+                    </Task>
+                )
+            };
+
+            render() {
+                return (
+                    <div className="field">
+                        <button onClick={this.addNewTask.bind(null, "New task")} className="btn new">Add new task</button>
+                        {
+                            this.state.tasks.map(this.eachTask)
+
+                        }
+                    </div>
+                );
+            }
+
+        };
+
+/*Render*/
+        const root = document.getElementById("root");
+
+        ReactDOM.render (
+            <Shell />,
+            root);
+
+    </script>
+    <!--
+      Note: this page is a great way to try React but it's not suitable for production.
+      It slowly compiles JSX with Babel in the browser and uses a large development build of React.
+
+      Read this section for a production-ready setup with JSX:
+      http://reactjs.org/docs/add-react-to-a-website.html#add-jsx-to-a-project
+
+      In a larger project, you can use an integrated toolchain that includes JSX instead:
+      http://reactjs.org/docs/create-a-new-react-app.html
+
+      You can also use React without JSX, in which case you can remove Babel:
+      https://reactjs.org/docs/react-without-jsx.html
+    -->
+  </body>
+</html>
